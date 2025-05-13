@@ -1,12 +1,16 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 
-export default function SparqlQueryTool() {
-  const [query, setQuery] = useState("SELECT ?s ?p ?o WHERE {?s ?p ?o} LIMIT 100");
+const SparqlQueryTool = () => {
+  const [query, setQuery] = useState(`
+    SELECT ?s ?p ?o WHERE {
+      ?s ?p ?o
+    } LIMIT 10
+  `);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleQuery = async () => {
+  const runQuery = async () => {
     setLoading(true);
     setError(null);
     setResults(null);
@@ -16,65 +20,66 @@ export default function SparqlQueryTool() {
         method: "POST",
         headers: {
           "Content-Type": "application/sparql-query",
-          Accept: "application/sparql-results+json",
+          "Accept": "application/sparql-results+json"
         },
-        body: query,
+        body: query
       });
 
-      if (!response.ok) throw new Error("Failed to fetch SPARQL results");
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
       const data = await response.json();
-      setResults(data);
+      setResults(data.results.bindings);
     } catch (err) {
-      setError(err.message);
+      console.error("SPARQL query error:", err);
+      setError(err.message || "Unknown error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Knowledge Graphs // GraphDB SPARQL Query Tool</h1>
+    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
+      <h2>SPARQL Query Tool</h2>
+
       <textarea
-        className="w-full p-2 border rounded h-40 font-mono text-sm"
+        rows="8"
+        cols="80"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        style={{ width: '100%', fontFamily: 'monospace', fontSize: '1rem' }}
       />
-      <button
-        onClick={handleQuery}
-        className="mt-2 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-      >
+
+      <button onClick={runQuery} style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>
         Run Query
       </button>
 
-      {loading && <p className="mt-4">Loading...</p>}
-      {error && <p className="mt-4 text-red-600">Error: {error}</p>}
+      {loading && <p>Running query...</p>}
+      {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
       {results && (
-        <div className="mt-6 overflow-x-auto">
-          <table className="table-auto border-collapse border w-full">
-            <thead>
-              <tr>
-                {results.head.vars.map((v) => (
-                  <th key={v} className="border px-4 py-2 text-left">{v}</th>
+        <table border="1" cellPadding="6" style={{ marginTop: '1rem', width: '100%' }}>
+          <thead>
+            <tr>
+              {Object.keys(results[0] || {}).map((key) => (
+                <th key={key}>{key}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {results.map((row, i) => (
+              <tr key={i}>
+                {Object.values(row).map((val, j) => (
+                  <td key={j}>{val.value}</td>
                 ))}
               </tr>
-            </thead>
-            <tbody>
-              {results.results.bindings.map((row, idx) => (
-                <tr key={idx}>
-                  {results.head.vars.map((v) => (
-                    <td key={v} className="border px-4 py-2 text-sm">
-                      {row[v] ? row[v].value : ""}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       )}
     </div>
   );
-}
+};
 
+export default SparqlQueryTool;
