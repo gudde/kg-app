@@ -1,11 +1,35 @@
 import React, { useState } from 'react';
 
+const exampleQueries = [
+  {
+    label: "Institutions with codes",
+    query: `PREFIX edu: <http://example.org/education#>
+
+      SELECT ?institution ?name ?code WHERE {
+        ?institution a edu:Institution ;
+                    edu:institutionName ?name ;
+                    edu:institutionCode ?code .
+      }`
+  },
+  {
+    label: "Institutions and courses",
+    query: `PREFIX edu: <http://example.org/education#>
+
+      SELECT ?institutionName ?courseName ?degreeType ?slots WHERE {
+        ?institution a edu:Institution ;
+                    edu:institutionName ?institutionName ;
+                    edu:hasCourse ?course .
+
+        ?course a edu:Course ;
+                edu:courseName ?courseName ;
+                edu:degreeType ?degreeType ;
+                edu:availableSlots ?slots .
+      }`
+  }
+];
+
 const SparqlQueryTool = () => {
-  const [query, setQuery] = useState(`
-    SELECT ?s ?p ?o WHERE {
-      ?s ?p ?o
-    } LIMIT 100
-  `);
+  const [query, setQuery] = useState(exampleQueries[0].query);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,6 +64,13 @@ const SparqlQueryTool = () => {
     }
   };
 
+  const handleExampleSelect = (e) => {
+    const selected = exampleQueries.find(q => q.label === e.target.value);
+    if (selected) {
+      setQuery(selected.query);
+    }
+  };
+
   return (
     <div style={{
       maxWidth: '1000px',
@@ -48,6 +79,19 @@ const SparqlQueryTool = () => {
       padding: '1rem'
     }}>
       <h1 style={{ textAlign: 'center' }}>SPARQL Query Interface</h1>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="exampleSelect" style={{ marginRight: '0.5rem' }}>Examples:</label>
+        <select
+          id="exampleSelect"
+          onChange={handleExampleSelect}
+          style={{ padding: '0.5rem', fontSize: '1rem' }}
+        >
+          {exampleQueries.map((ex, idx) => (
+            <option key={idx} value={ex.label}>{ex.label}</option>
+          ))}
+        </select>
+      </div>
 
       <textarea
         value={query}
@@ -58,7 +102,6 @@ const SparqlQueryTool = () => {
           fontSize: '1rem',
           fontFamily: 'monospace',
           padding: '1rem',
-          boxSizing: 'border-box',
           borderRadius: '6px',
           border: '1px solid #ccc',
           marginBottom: '1rem'
