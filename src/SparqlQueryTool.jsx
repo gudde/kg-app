@@ -1,11 +1,34 @@
 import React, { useState } from 'react';
 
+const exampleQueries = [
+  {
+    label: "Basic triple pattern",
+    query: `SELECT ?s ?p ?o WHERE {
+  ?s ?p ?o
+} LIMIT 10`
+  },
+  {
+    label: "Classes used in the KG",
+    query: `SELECT DISTINCT ?type WHERE {
+  ?s a ?type
+} LIMIT 20`
+  },
+  {
+    label: "Entities with labels",
+    query: `SELECT ?s ?label WHERE {
+  ?s rdfs:label ?label
+} LIMIT 20`
+  },
+  {
+    label: "All predicates used",
+    query: `SELECT DISTINCT ?p WHERE {
+  ?s ?p ?o
+} LIMIT 20`
+  }
+];
+
 const SparqlQueryTool = () => {
-  const [query, setQuery] = useState(`
-    SELECT ?s ?p ?o WHERE {
-      ?s ?p ?o
-    } LIMIT 10
-  `);
+  const [query, setQuery] = useState(exampleQueries[0].query);
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -40,6 +63,13 @@ const SparqlQueryTool = () => {
     }
   };
 
+  const handleExampleSelect = (e) => {
+    const selected = exampleQueries.find(q => q.label === e.target.value);
+    if (selected) {
+      setQuery(selected.query);
+    }
+  };
+
   return (
     <div style={{
       maxWidth: '1000px',
@@ -48,6 +78,19 @@ const SparqlQueryTool = () => {
       padding: '1rem'
     }}>
       <h1 style={{ textAlign: 'center' }}>SPARQL Query Interface</h1>
+
+      <div style={{ marginBottom: '1rem' }}>
+        <label htmlFor="exampleSelect" style={{ marginRight: '0.5rem' }}>Examples:</label>
+        <select
+          id="exampleSelect"
+          onChange={handleExampleSelect}
+          style={{ padding: '0.5rem', fontSize: '1rem' }}
+        >
+          {exampleQueries.map((ex, idx) => (
+            <option key={idx} value={ex.label}>{ex.label}</option>
+          ))}
+        </select>
+      </div>
 
       <textarea
         value={query}
@@ -58,7 +101,6 @@ const SparqlQueryTool = () => {
           fontSize: '1rem',
           fontFamily: 'monospace',
           padding: '1rem',
-          boxSizing: 'border-box',
           borderRadius: '6px',
           border: '1px solid #ccc',
           marginBottom: '1rem'
