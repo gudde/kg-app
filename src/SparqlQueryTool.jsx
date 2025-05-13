@@ -17,7 +17,7 @@ const SparqlQueryTool = () => {
 
     try {
       const response = await fetch("https://kg-project.fly.dev/repositories/kg-01", {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/sparql-query",
           "Accept": "application/sparql-results+json"
