@@ -12,7 +12,7 @@ export default function SparqlQueryTool() {
     setResults(null);
 
     try {
-      const response = await fetch("https://kg-project.fly.dev:7200/repositories/kg-01", {
+      const response = await fetch("https://kg-project.fly.dev/repositories/kg-01", {
         method: "POST",
         headers: {
           "Content-Type": "application/sparql-query",
