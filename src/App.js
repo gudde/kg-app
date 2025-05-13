@@ -1,12 +1,5 @@
-import React from 'react';
 import SparqlQueryTool from './SparqlQueryTool';
 
 function App() {
-  return (
-    <div className="App">
-      <SparqlQueryTool />
-    </div>
-  );
+  return <SparqlQueryTool />;
 }
-
-export default App;

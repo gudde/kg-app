@@ -6,24 +6,23 @@ const SparqlQueryTool = () => {
       ?s ?p ?o
     } LIMIT 10
   `);
-  const [results, setResults] = useState(null);
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const query1 = encodeURIComponent("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10");
-  const url = `https://kg-project.fly.dev/repositories/kg-01?query=${query1}`;
-
 
   const runQuery = async () => {
     setLoading(true);
     setError(null);
-    setResults(null);
+    setResults([]);
+
+    const encodedQuery = encodeURIComponent(query);
+    const endpoint = `https://kg-project.fly.dev/repositories/kg-01?query=${encodedQuery}`;
 
     try {
-      const response = await fetch(url, {
+      const response = await fetch(endpoint, {
         method: "GET",
         headers: {
-          "Accept": "application/sparql-results+json"
+          Accept: "application/sparql-results+json"
         }
       });
 
@@ -42,43 +41,84 @@ const SparqlQueryTool = () => {
   };
 
   return (
-    <div style={{ padding: '2rem', fontFamily: 'sans-serif' }}>
-      <h2>SPARQL Query Tool</h2>
+    <div style={{
+      maxWidth: '1000px',
+      margin: '2rem auto',
+      fontFamily: 'Arial, sans-serif',
+      padding: '1rem'
+    }}>
+      <h1 style={{ textAlign: 'center' }}>SPARQL Query Interface</h1>
 
       <textarea
-        rows="8"
-        cols="80"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        style={{ width: '100%', fontFamily: 'monospace', fontSize: '1rem' }}
+        rows="8"
+        style={{
+          width: '100%',
+          fontSize: '1rem',
+          fontFamily: 'monospace',
+          padding: '1rem',
+          boxSizing: 'border-box',
+          borderRadius: '6px',
+          border: '1px solid #ccc',
+          marginBottom: '1rem'
+        }}
       />
 
-      <button onClick={runQuery} style={{ marginTop: '1rem', padding: '0.5rem 1rem' }}>
-        Run Query
-      </button>
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+        <button
+          onClick={runQuery}
+          style={{
+            padding: '0.75rem 1.5rem',
+            fontSize: '1rem',
+            borderRadius: '5px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            cursor: 'pointer'
+          }}
+        >
+          Run Query
+        </button>
+      </div>
 
-      {loading && <p>Running query...</p>}
+      {loading && <p>Loading...</p>}
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
-      {results && (
-        <table border="1" cellPadding="6" style={{ marginTop: '1rem', width: '100%' }}>
-          <thead>
-            <tr>
-              {Object.keys(results[0] || {}).map((key) => (
-                <th key={key}>{key}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {results.map((row, i) => (
-              <tr key={i}>
-                {Object.values(row).map((val, j) => (
-                  <td key={j}>{val.value}</td>
+      {results.length > 0 && (
+        <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
+          <table style={{
+            width: '100%',
+            borderCollapse: 'collapse',
+            fontSize: '0.95rem'
+          }}>
+            <thead>
+              <tr>
+                {Object.keys(results[0]).map((col) => (
+                  <th key={col} style={{
+                    border: '1px solid #ccc',
+                    padding: '8px',
+                    backgroundColor: '#f0f0f0',
+                    textAlign: 'left'
+                  }}>{col}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {results.map((row, i) => (
+                <tr key={i}>
+                  {Object.values(row).map((cell, j) => (
+                    <td key={j} style={{
+                      border: '1px solid #ccc',
+                      padding: '8px',
+                      wordBreak: 'break-word'
+                    }}>{cell.value}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );
