@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function SparqlQueryTool() {
-  const [query, setQuery] = useState("SELECT ?s ?p ?o WHERE {?s ?p ?o} LIMIT 10");
+  const [query, setQuery] = useState("SELECT ?s ?p ?o WHERE {?s ?p ?o} LIMIT 100");
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
