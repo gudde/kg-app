@@ -10,19 +10,21 @@ const SparqlQueryTool = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
+  const query1 = encodeURIComponent("SELECT ?s ?p ?o WHERE { ?s ?p ?o } LIMIT 10");
+  const url = `https://kg-project.fly.dev/repositories/kg-01?query=${query1}`;
+
+
   const runQuery = async () => {
     setLoading(true);
     setError(null);
     setResults(null);
 
     try {
-      const response = await fetch("https://kg-project.fly.dev/repositories/kg-01", {
+      const response = await fetch(url, {
         method: "GET",
         headers: {
-          "Content-Type": "application/sparql-query",
           "Accept": "application/sparql-results+json"
-        },
-        body: query
+        }
       });
 
       if (!response.ok) {
