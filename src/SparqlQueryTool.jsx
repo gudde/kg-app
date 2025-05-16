@@ -78,7 +78,7 @@ const SparqlQueryTool = () => {
       fontFamily: 'Arial, sans-serif',
       padding: '1rem'
     }}>
-      <h1 style={{ textAlign: 'center' }}>SPARQL Query Interface</h1>
+      <h1 style={{ textAlign: 'center' }}>Knowledge Graphs // GraphDB SPARQL Query Interface</h1>
 
       <div style={{ marginBottom: '1rem' }}>
         <label htmlFor="exampleSelect" style={{ marginRight: '0.5rem' }}>Examples:</label>
