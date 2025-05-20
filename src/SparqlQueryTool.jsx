@@ -63,7 +63,7 @@ const SparqlQueryTool = () => {
     setResults([]);
 
     const encodedQuery = encodeURIComponent(query);
-    const endpoint = `https://kg-project.fly.dev/repositories/kg-01?query=${encodedQuery}`;
+    const endpoint = `https://kg-project.fly.dev/repositories/kg_education?query=${encodedQuery}`;
 
     try {
       const response = await fetch(endpoint, {
