@@ -48,7 +48,30 @@ const exampleQueries = [
         # FILTER(xsd:float(?grade) >= 140)
       }
       LIMIT 10`
-    }
+    },
+{
+label:"Apresentação Query 1",
+query:`PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+  PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+  PREFIX edu: <http://example.org/education#>
+
+  SELECT DISTINCT ?institutionCode ?institutionName ?grade ?courseCode ?courseName
+  WHERE {
+    ?institution a edu:Institution;
+                edu:institutionCode ?institutionCode ;
+                edu:institutionName ?institutionName ;
+                edu:locatedInDistrict ?location ;
+                edu:hasCourse ?course .
+    
+    ?location edu:districtName ?districtName .
+
+    ?course rdf:type ?courseType;
+            edu:lastAdmittedGrade ?grade .
+
+    ?courseType edu:courseName ?courseName ;
+                edu:courseCode ?courseCode .
+`
+}
 ];
 
 const SparqlQueryTool = () => {
